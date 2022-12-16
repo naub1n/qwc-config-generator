@@ -94,6 +94,10 @@
         "autogen_keyvaltable_datasets": {
           "description": "Whether to automatically generate data service datasets used for key-value relationships without requiring corresponding data resources to be created. Warning: this will expose the key and value fields of the key-value table as world readable. Default: false",
           "type": "boolean"
+        },
+        "grouped_by_dir": {
+          "description": "Set to true to group projects like directory structure",
+          "type": "boolean"
         }
       },
       "required": [

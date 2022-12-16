@@ -30,7 +30,8 @@ Example `tenantConfig.json`:
     "qgis_projects_gen_base_dir": "/data/gen",
     "permissions_default_allow": true,
     "validate_schema": true,
-    "autogen_keyvaltable_datasets": false
+    "autogen_keyvaltable_datasets": false,
+    "grouped_by_dir": true
   },
   "themesConfig": {
       "defaultScales": [100000000, 50000000, 25000000, 10000000, 4000000, 2000000, 1000000, 400000, 200000, 80000, 40000, 20000, 10000, 8000, 6000, 4000, 2000, 1000, 500, 250, 100],
@@ -270,6 +271,14 @@ The ConfigGenerator has also the ability to split a layer, that has been [classi
 6. The ConfigGenerator will process the projects and write the modified projects to qgis_projects_gen_base_dir`. Hence, if for instance qgis_projects_base_dir=/data` and `qgis_projects_gen_base_dir=/data/gen`, the resource name for map `mymap` will be `gen/mymap`.
 
 *NOTE:* If you are using the qwc-config-generator Docker images, make sure you are using `qwc-config-generator:v<version>` and not `qwc-config-generator:v<version>-noqgis`.
+
+### Group projects like directory structure
+
+The ConfigGenerator can group projects like subdirectories structure in `qgis_projects_scan_base_dir`. The groups names in MapViewer are directories names in `qgis_projects_scan_base_dir`.
+
+1. Ensure `qgis_projects_scan_base_dir` is set in the ConfigGenerator configuration.
+2. Ensure `grouped_by_dir` is set to `true` in the ConfigGenerator configuration.
+
 
 ### Schema validation
 

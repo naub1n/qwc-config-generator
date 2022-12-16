@@ -635,6 +635,8 @@ class ConfigGenerator():
         qgis_projects_scan_base_dir = generator_config.get(
             'qgis_projects_scan_base_dir')
         qwc_base_dir = generator_config.get("qwc2_base_dir")
+        grouped_by_dir = generator_config.get(
+            'grouped_by_dir', False)
 
         if not qgis_projects_scan_base_dir:
             self.logger.info(
@@ -662,6 +664,13 @@ class ConfigGenerator():
             if item.get("default", False):
                 has_default = True
 
+        # Collect existing groups (and create it if not exists)
+        if 'groups' not in themes_config.get("themes", {}):
+            themes_config.get("themes", {})['groups'] = []
+
+        groups = themes_config.get("themes", {}).get(
+            "groups", [])
+
         # This is needed because we don't want to
         # print the error message "thumbnail dir not found"
         # multiple times
@@ -685,6 +694,50 @@ class ConfigGenerator():
                                               qgis_projects_base_dir)
                     wmspath = os.path.join(relpath, Path(filename).stem)
                     wmsurlpath = urlparse(urljoin(self.default_qgis_server_url, wmspath)).path
+
+                    if grouped_by_dir:
+                        relscanpath = os.path.relpath(dirpath,
+                                                      qgis_projects_scan_base_dir)
+                        self.logger.debug("relscanpath: '%s'" % relscanpath)
+                        subdirs = relscanpath.split(os.path.sep)
+                        self.logger.debug("subdirs: '%s'" % subdirs)
+                        if subdirs:
+                            for index, dir in enumerate(subdirs):
+                                # When projet is in root scan path, 'dir' return '.'
+                                if dir == '.':
+                                    items = themes_config.get("themes", {}).get("items", [])
+                                else:
+                                    # Check if group already exists
+                                    grp_exists = False
+                                    for group in groups:
+                                        if ('title', dir) in group.items():
+                                            grp_exists = True
+
+                                    # If not exists, add a new group with dir name as title
+                                    if not grp_exists:
+                                        new_group = OrderedDict()
+                                        new_group['title'] = dir
+                                        new_group['items'] = []
+                                        self.logger.debug("Add group: '%s'" % str(new_group))
+                                        groups.append(new_group)
+
+                                    for group in groups:
+                                        # When find group with dir name ...
+                                        if group['title'] == dir:
+                                            # if subdir is the last in project path ...
+                                            if index == len(subdirs) - 1:
+                                                # replace intial 'items' variable
+                                                # with the correct 'items' element in subgroups
+                                                items = group.get("items", [])
+
+                                            # if not the last subdir, create and select a subgroup
+                                            else:
+                                                if 'groups' not in group:
+                                                    group['groups'] = []
+
+                                                groups = group.get("groups", [])
+                                            # exit loop
+                                            break
 
                     # Add to themes items
                     item = OrderedDict()
